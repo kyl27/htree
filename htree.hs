@@ -1,19 +1,25 @@
 import Data.List
 import System.Directory
 
+indent :: Int -> String
+indent depth
+    | depth == 0 = "    "
+    | otherwise = foldl dup "" [0..depth]
+    where dup acc ele = acc ++ "    "
+    
 
 tree :: Int -> FilePath -> IO ()
 tree depth filepath = do
     contents <- getDirectoryContents filepath
     let items = filter (not . isPrefixOf ".") contents
-    let fullPaths = map ((filepath ++ "/") ++) items
     let ls_rec acc ele = do 
-        isFile <- doesFileExist ele
+        let fullPath = filepath ++ "/" ++ ele
+        isFile <- doesFileExist fullPath
         if isFile then 
-            acc >> putStrLn (show depth ++ ele)
+            acc >> putStrLn (indent depth ++ ele)
         else 
-            acc >> withCurrentDirectory ele (tree (depth + 1) ele)
-    foldl ls_rec (return ()) fullPaths
+            acc >> withCurrentDirectory fullPath (tree (depth + 1) fullPath)
+    foldl ls_rec (return ()) items
 
 
 main :: IO ()
