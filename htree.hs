@@ -1,7 +1,7 @@
 import System.Directory
 
 main :: IO ()
-main = do 
+main = do
     getCurrentDirectory >>= ls
 
 
@@ -11,11 +11,10 @@ ls filepath = do
     contents <- getDirectoryContents filepath
     let items = filter (`notElem` [".", ".."]) contents
     let fullPaths = map ((filepath ++ "/") ++) items
-    let ls_rec acc ele = do 
-        print ele
+    let ls_rec acc ele = do
         isFile <- doesFileExist ele
-        if isFile then 
-            acc 
-        else 
-            withCurrentDirectory ele (ls ele)
-    foldl ls_rec (print "") fullPaths
+        if isFile then
+            acc >> print ele
+        else
+            acc >> withCurrentDirectory ele (ls ele)
+    foldl ls_rec (return ()) fullPaths
