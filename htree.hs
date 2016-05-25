@@ -1,20 +1,27 @@
+import Data.List
 import System.Directory
 
-main :: IO ()
-main = do
-    getCurrentDirectory >>= ls
+indent :: Int -> String
+indent depth
+    | depth == 0 = "    "
+    | otherwise = foldl dup "" [0..depth]
+    where dup acc ele = acc ++ "    "
+    
 
-
-ls :: FilePath -> IO ()
-ls filepath = do
-    -- print filepath
+tree :: Int -> FilePath -> IO ()
+tree depth filepath = do
     contents <- getDirectoryContents filepath
-    let items = filter (`notElem` [".", ".."]) contents
-    let fullPaths = map ((filepath ++ "/") ++) items
-    let ls_rec acc ele = do
-        isFile <- doesFileExist ele
-        if isFile then
-            acc >> print ele
-        else
-            acc >> withCurrentDirectory ele (ls ele)
-    foldl ls_rec (return ()) fullPaths
+    let items = filter (not . isPrefixOf ".") contents
+    let ls_rec acc ele = do 
+        let fullPath = filepath ++ "/" ++ ele
+        isFile <- doesFileExist fullPath
+        if isFile then 
+            acc >> putStrLn (indent depth ++ ele)
+        else 
+            acc >> withCurrentDirectory fullPath (tree (depth + 1) fullPath)
+    foldl ls_rec (return ()) items
+
+
+main :: IO ()
+main = do 
+    getCurrentDirectory >>= tree 0
