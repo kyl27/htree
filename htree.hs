@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 import Data.List
 import System.Directory
 import System.Environment
