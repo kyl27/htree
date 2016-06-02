@@ -12,4 +12,4 @@ tree: tree.hs
 	strip tree
 
 clean:
-	rm -rf htree *.o *.hi
+	rm -rf tree htree *.o *.hi
